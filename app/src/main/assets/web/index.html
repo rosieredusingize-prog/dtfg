@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DTFG World Hub AI — Public Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app" class="hub-container">
+    <!-- Top Hub Navigation Header -->
+    <header class="hub-header">
+      <div class="header-branding">
+        <div class="logo-wrapper">
+          <img src="assets/logo.jpg" alt="DTFG World Hub Logo" class="hub-logo">
+        </div>
+        <div class="title-meta">
+          <div class="title-row">
+            <span class="hub-title">DTFG WORLD HUB</span>
+            <span class="ai-badge">AI</span>
+          </div>
+          <div class="status-row">
+            <span class="pulse-dot"></span>
+            <span class="status-text">7 Specialized Nodes • Public Visitor Access</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="downloadChatBtn" class="icon-btn" title="Download current chat (JSON)" aria-label="Download chat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+        <button id="clearChatBtn" class="icon-btn" title="Clear current assistant chat" aria-label="Clear chat">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </button>
+        <button id="openHistoryBtn" class="icon-btn" title="View chat history" aria-label="Chat history">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="historyBadge" class="badge hidden">0</span>
+        </button>
+        <button id="openInfoBtn" class="icon-btn" title="About DTFG World Hub" aria-label="Hub Information">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Assistant Selector Navigation Bar -->
+    <nav class="assistant-nav" aria-label="AI Assistants selector">
+      <div class="assistant-chips-scroll" id="assistantChipsList">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+    </nav>
+
+    <!-- Main Chat Workspace -->
+    <main class="chat-workspace" id="chatWorkspace">
+      <!-- Active Assistant Hero / Welcome View (visible when thread is empty) -->
+      <section id="welcomeView" class="welcome-section">
+        <div class="hero-banner-card">
+          <div class="banner-img-wrapper">
+            <img src="assets/banner.jpg" alt="DTFG Command Center" class="hero-banner-img">
+            <div class="banner-overlay"></div>
+          </div>
+          <div class="assistant-profile-card">
+            <div class="profile-header">
+              <div class="avatar-glow" id="welcomeAvatarGlow">
+                <span class="assistant-icon" id="welcomeIcon">🤖</span>
+              </div>
+              <div class="profile-titles">
+                <h2 id="welcomeName">DTFG General AI</h2>
+                <span class="domain-tag" id="welcomeDomain">General Knowledge & Everyday Intelligence</span>
+              </div>
+            </div>
+            <p id="welcomeDescription" class="profile-desc">
+              Your universal knowledge navigator for everyday inquiries, writing, summarization, and strategic problem-solving.
+            </p>
+            <div class="capabilities-list" id="welcomeCapabilities">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-suggestions-box">
+          <div class="suggestions-header">
+            <span>RECOMMENDED PROMPTS</span>
+            <div class="header-line"></div>
+          </div>
+          <div class="prompts-grid" id="welcomePromptsGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Message History List (visible when messages exist) -->
+      <section id="messageList" class="message-list hidden" aria-live="polite">
+        <!-- Messages rendered dynamically -->
+      </section>
+
+      <!-- Generating Indicator -->
+      <div id="generatingIndicator" class="generating-indicator hidden">
+        <div class="spinner"></div>
+        <span id="generatingText">DTFG AI is synthesizing response with Google Gemini...</span>
+      </div>
+    </main>
+
+    <!-- Error Alert Banner -->
+    <div id="errorBanner" class="error-banner hidden" role="alert">
+      <span class="error-icon">⚠️</span>
+      <span id="errorMessage" class="error-text">An error occurred.</span>
+      <button id="dismissErrorBtn" class="dismiss-btn">&times;</button>
+    </div>
+
+    <!-- Bottom Input Capsule -->
+    <footer class="input-footer">
+      <!-- Voice Recording Status Banner -->
+      <div id="voiceRecordingBar" class="voice-recording-bar hidden" role="status" aria-live="assertive">
+        <div class="sound-wave">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+        </div>
+        <span id="voiceStatusText" class="voice-status-text">Listening... speak your prompt clearly</span>
+        <button type="button" id="cancelVoiceBtn" class="cancel-voice-btn" title="Stop listening">Done</button>
+      </div>
+
+      <form id="chatForm" class="chat-form" onsubmit="return false;">
+        <div class="input-capsule">
+          <textarea
+            id="chatInput"
+            rows="1"
+            placeholder="Consult DTFG AI..."
+            aria-label="Message prompt input"
+          ></textarea>
+          <button type="button" id="clearInputBtn" class="clear-input-btn hidden" title="Clear input">
+            &times;
+          </button>
+        </div>
+        <button type="button" id="micBtn" class="mic-btn" title="Dictate prompt with voice" aria-label="Voice dictation">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+        <button type="submit" id="sendBtn" class="send-btn" title="Send message" disabled>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
+        </button>
+      </form>
+      <div class="footer-note">
+        <span>DTFG World Hub • Voice & Text Input • Decoupled Secure Architecture</span>
+      </div>
+    </footer>
+
+    <!-- History Modal Dialog -->
+    <div id="historyModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+      <div class="modal-content history-modal-content">
+        <div class="modal-header">
+          <div class="modal-title-row">
+            <h3 id="historyModalTitle">DTFG Chat History</h3>
+            <span id="historyTotalCount" class="history-count-badge">0</span>
+          </div>
+          <div class="modal-header-actions">
+            <button id="exportAllHistoryBtn" class="secondary-btn" title="Export all assistants history (JSON)">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export JSON
+            </button>
+            <button id="clearAllHistoryBtn" class="danger-btn" title="Clear all history">
+              Clear All
+            </button>
+            <button id="closeHistoryBtn" class="modal-close-btn" aria-label="Close history modal">&times;</button>
+          </div>
+        </div>
+
+        <div class="history-search-bar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="historySearchInput" placeholder="Search saved questions and insights...">
+        </div>
+
+        <div class="history-filter-tabs" id="historyFilterTabs">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="history-items-container" id="historyItemsContainer">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Hub Info Modal Dialog -->
+    <div id="infoModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
+      <div class="modal-content info-modal-content">
+        <div class="modal-header">
+          <div class="info-header-brand">
+            <img src="assets/logo.jpg" alt="DTFG Logo" class="info-logo">
+            <div>
+              <h3 id="infoModalTitle">DTFG World Hub AI</h3>
+              <span class="info-subtitle">Public Autonomous Intelligence Platform</span>
+            </div>
+          </div>
+          <button id="closeInfoBtn" class="modal-close-btn" aria-label="Close information modal">&times;</button>
+        </div>
+
+        <div class="info-body">
+          <p class="info-intro">
+            DTFG World Hub AI is an open, enterprise-grade intelligence platform delivering seven specialized autonomous AI assistants. Engineered for global visitors, professionals, entrepreneurs, researchers, and students.
+          </p>
+
+          <h4 class="info-section-title">THE 7 SPECIALIZED ASSISTANTS</h4>
+          <div class="info-assistants-grid" id="infoAssistantsGrid">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div class="info-security-card">
+            <div class="security-icon">🛡️</div>
+            <div class="security-text">
+              <strong>Secure Backend & Visitor Privacy</strong>
+              <p>Visitors access the platform directly without needing an account or supplying API keys. Requests are routed through our decoupled backend powered by Google Gemini, maintaining persistent on-device history.</p>
+            </div>
+          </div>
+
+          <button id="dismissInfoBtn" class="primary-modal-btn">Explore DTFG Hub</button>
+        </div>
+      </div>
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast-notification hidden" role="status" aria-live="polite">
+      <span class="toast-icon">💾</span>
+      <span id="toastMessage" class="toast-message">Chat exported successfully</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

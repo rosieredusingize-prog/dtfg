@@ -1,0 +1,6 @@
+{
+  "name": "DTFG World Hub AI",
+  "description": "DTFG World Hub AI public intelligence platform featuring 7 specialized AI assistants powered by Google Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
